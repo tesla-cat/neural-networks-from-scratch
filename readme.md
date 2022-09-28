@@ -110,3 +110,82 @@ class Conv(Full):
 ### training using FashionMNIST
 
 - [part1/d_train.py](part1/d_train.py)
+
+```python
+train_data, test_data = get_data()
+
+if 0:
+    net = Series([ 
+        Full(28*28, 512), Relu(),
+        Full(512, 512),   Relu(),
+        Full(512, 10)
+    ])
+else:
+    net = Series([ 
+        Conv(1, 8, 3, 2), Relu(),
+        Conv(8, 8, 3, 2), Relu(),
+        Full(np.prod((8, 6, 6)), 10),
+    ])
+
+@timer
+def test():
+    right = 0; tot = 0
+    for x, t in test_data:
+        y = net.forward(x)
+        right += sum(np.argmax(y, 1) == t)
+        tot += len(y)
+    print(f'accuracy {right}/{tot}')
+
+@timer
+def train():
+    tot = 0
+    for x, t in train_data:
+        y = net.forward(x)
+        err, de_dy = cross_entropy_loss(y, t)
+        net.backward(de_dy, lr=0.1)
+        tot += len(y)
+
+test()
+for e in range(10):
+    train()
+    test()
+
+```
+
+- output
+
+```cmd
+                     get_data took 0.250 s
+accuracy 171/2000
+                     test took 1.192 s
+                     train took 2.823 s
+accuracy 1071/2000
+                     test took 0.346 s
+                     train took 1.564 s
+accuracy 1274/2000
+                     test took 0.347 s
+                     train took 1.580 s
+accuracy 1334/2000
+                     test took 0.342 s
+                     train took 1.549 s
+accuracy 1360/2000
+                     test took 0.339 s
+                     train took 1.571 s
+accuracy 1396/2000
+                     test took 0.351 s
+                     train took 1.546 s
+accuracy 1411/2000
+                     test took 0.342 s
+                     train took 1.548 s
+accuracy 1442/2000
+                     test took 0.347 s
+                     train took 1.573 s
+accuracy 1464/2000
+                     test took 0.340 s
+                     train took 1.549 s
+accuracy 1480/2000
+                     test took 0.342 s
+                     train took 1.563 s
+accuracy 1490/2000
+                     test took 0.342 s
+```
